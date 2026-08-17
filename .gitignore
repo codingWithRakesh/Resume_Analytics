@@ -1,2 +1,4 @@
 client/node_modules
+main_server/node_modules
+main_server/.evn
 client/.env
