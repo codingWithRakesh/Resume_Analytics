@@ -1,2 +1,5 @@
 client/node_modules
 client/.env
+
+ai_server/node_modules
+ai_server/.env
