@@ -1,9 +1,9 @@
 import jwt from "jsonwebtoken"
 import admin from "firebase-admin";
 import dotenv from "dotenv";
-import User from "../models/user.model";
-import { ApiError } from "../utils/apiError";
-import { asyncHandler } from "../utils/asyncHandler";
+import User from "../models/user.model.js";
+import { ApiError } from "../utils/apiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 dotenv.config()
 admin.initializeApp({
     credential: admin.credential.cert({
