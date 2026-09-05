@@ -267,13 +267,20 @@ export default function SignUpPage() {
     }))
   }
 
-  const handleSendOtp = () => {
+  const handleSendOtp = async() => {
     setAttemptedSubmit(true)
 
     if (validate({ email: value.email }).email) {
       return
     }
-
+    const url=`${import.meta.env.VITE_BACKEND_URL}/api/v1/auth/send-email`
+    const res=await fetch(url,{
+      method:"POST",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email:value.email }),
+    })
+    const data= await res.json();
+    console.log(data);
     setStep('otp')
     setOtp(['', '', '', '', '', ''])
     setOtpMessage('')
@@ -335,7 +342,7 @@ export default function SignUpPage() {
     handleCompleteSignup()
   }
 
-  const buttonLabel = step === 'otp' ? 'SUBMIT OTP' : 'SIGN UP'
+  const buttonLabel = step === 'otp' ? 'SUBMIT OTP' : 'Send OTP'
 
   const handleOtpChange = (nextOtp) => {
     setOtp(nextOtp)

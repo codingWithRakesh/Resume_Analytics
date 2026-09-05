@@ -30,7 +30,7 @@ const verifyUser = asyncHandler(async (req, res, next) => {
         const email = decoded.email;
         const user = await User.findOne({ email }).select('-password').lean();
         if (!user) {
-            throw new ApiError(401, 'User not found');
+            throw new ApiError(404, 'User not found');
 
         }
         req.user = user;
@@ -44,7 +44,7 @@ const verifyUser = asyncHandler(async (req, res, next) => {
         const email = decoded.email;
         const user = await User.findOne({ email }).select('-password').lean();
         if (!user) {
-            throw new ApiError(401, 'User not found');
+            throw new ApiError(404, 'User not found');
 
         }
         req.user = user;
