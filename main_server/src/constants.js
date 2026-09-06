@@ -1,4 +1,4 @@
-export const DB_NAME = "AiInterview";
+export const DB_NAME = "aiInterview";
 export const options = {
     httpOnly: true,
     secure: true,
