@@ -7,6 +7,7 @@ import { generateReferenceCode } from "../utils/referenceCodeGenFun.js";
 import OTP from "../models/otp.model.js";
 import { uploadToImageKit } from "../utils/imageKit.js";
 import { options } from "../constants.js";
+import bcrypt from "bcrypt";
 const sendOtp = asyncHandler(async (req, res) => {
     console.log(req.body)
     const { email } = req.body;
@@ -48,6 +49,7 @@ const verifyOtp = asyncHandler(async (req, res) => {
 })
 
 const register = asyncHandler(async (req, res) => {
+    console.log(req.body);
     const { fullName, email, password, bio } = req.body;
     if (!fullName || !bio || !password || !email) {
         throw new ApiError(400, 'All details are not found');

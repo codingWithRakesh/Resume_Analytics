@@ -1,6 +1,7 @@
 import { ArrowRight, Lock, Mail, User } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import Alert from '../components/Alert.jsx'
 import BrandLogo from '../components/BrandLogo.jsx'
 import BrutalistButton from '../components/BrutalistButton.jsx'
 import BrutalistCard from '../components/BrutalistCard.jsx'
@@ -10,6 +11,8 @@ import InputField from '../components/InputField.jsx'
 import OtpInput from '../components/OtpInput.jsx'
 import PasswordField from '../components/PasswordField.jsx'
 import ProfilePhotoUploader from '../components/ProfilePhotoUploader.jsx'
+import { BrutalistBlocksLoader, BrutalistSpinner } from '../components/Loder.jsx'
+
 
 const pageClassName =
   'relative min-h-screen overflow-x-hidden px-[8px] py-[6px] text-[#111] max-[1100px]:px-3 max-[1100px]:py-3 max-[720px]:px-3 max-[720px]:py-3 max-[560px]:px-[10px] max-[560px]:py-[10px]'
@@ -208,6 +211,7 @@ export default function SignUpPage() {
     password: '',
     confirmPassword: '',
   })
+  const [sendloder, setSendloder] = useState(false)
   const [touched, setTouched] = useState({
     email: false,
     fullName: false,
@@ -223,6 +227,7 @@ export default function SignUpPage() {
   const [profilePhoto, setProfilePhoto] = useState(null)
   const [profilePhotoPreview, setProfilePhotoPreview] = useState('')
   const [profileStatusMessage, setProfileStatusMessage] = useState('')
+  const [alert, setAlert] = useState({ message: '', type: 'info' })
   const isProfileStep = step === 'profile'
 
   const errors = validate(value)
@@ -267,24 +272,40 @@ export default function SignUpPage() {
     }))
   }
 
-  const handleSendOtp = async() => {
+  const handleSendOtp = async () => {
+    setSendloder(true)
     setAttemptedSubmit(true)
+    setAlert({ message: '', type: 'info' })
 
     if (validate({ email: value.email }).email) {
+      setSendloder(false)
       return
     }
-    const url=`${import.meta.env.VITE_BACKEND_URL}/api/v1/auth/send-email`
-    const res=await fetch(url,{
-      method:"POST",
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email:value.email }),
-    })
-    const data= await res.json();
-    console.log(data);
-    setStep('otp')
-    setOtp(['', '', '', '', '', ''])
-    setOtpMessage('')
-    setOtpMessageTone('default')
+
+    try {
+      const url = `${import.meta.env.VITE_BACKEND_URL}/api/v1/auth/send-email`
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: value.email }),
+      })
+      const data = await res.json()
+
+      if (!res.ok) {
+        setAlert({ message: data.message || 'Unable to send the OTP. Please try again.', type: 'error' })
+        return
+      }
+
+      setAlert({ message: data.message || 'OTP sent to your email.', type: 'success' })
+      setStep('otp')
+      setOtp(['', '', '', '', '', ''])
+      setOtpMessage('')
+      setOtpMessageTone('default')
+    } catch {
+      setAlert({ message: 'Unable to reach the server. Please try again.', type: 'error' })
+    } finally {
+      setSendloder(false)
+    }
   }
 
   const handleVerifyOtp = () => {
@@ -429,6 +450,12 @@ export default function SignUpPage() {
               <p className={isProfileStep ? profileSubtitleClassName : subtitleClassName}>
                 Create your account to get started.
               </p>
+
+              <Alert
+                message={alert.message}
+                type={alert.type}
+                onClose={() => setAlert({ message: '', type: 'info' })}
+              />
 
               {!isProfileStep ? (
                 <>
@@ -594,7 +621,7 @@ export default function SignUpPage() {
                   density={isProfileStep ? 'profile' : 'compact'}
                   className={isProfileStep ? profileButtonClassName : 'mb-2'}
                 >
-                  <span className="font-black">{buttonLabel}</span>
+                  {sendloder ? <BrutalistBlocksLoader /> : <span className="font-black">{buttonLabel}</span>}
                 </BrutalistButton>
 
                 {isProfileStep ? (
