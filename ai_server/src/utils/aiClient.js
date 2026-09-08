@@ -2,11 +2,14 @@ import { ChatGoogle } from '@langchain/google';
 import { ApiError } from './apiError.js';
 import getApiKey from './getApiKey.js';
 
-const model = new ChatGoogle({
-    model: 'gemini-2.5-flash',
-    temperature: 0,
-    apiKey: getApiKey(),
-});
+function getModel() {
+    const { apiKey, model } = getApiKey();
+    return new ChatGoogle({
+        model: model,
+        temperature: 0,
+        apiKey: apiKey,
+    });
+}
 
 const extractText = (aiResponse) => {
     const content = aiResponse?.content;
@@ -26,7 +29,6 @@ const extractText = (aiResponse) => {
     return '';
 };
 
-
 const stripCodeFences = (text) => {
     let cleaned = text.trim();
 
@@ -43,6 +45,7 @@ const stripCodeFences = (text) => {
 
 export const callAIJson = async (systemPrompt, userPrompt) => {
     let aiResponse;
+    const model = getModel();
 
     try {
         aiResponse = await model.invoke([

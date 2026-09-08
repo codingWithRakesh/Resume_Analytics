@@ -1,4 +1,4 @@
-import {Schema, model} from "mongoose"
+import { Schema, model } from "mongoose"
 const userSchema = new Schema({
     fullName: {
         type: String,
@@ -10,16 +10,16 @@ const userSchema = new Schema({
         required: true,
         trim: true
     },
-    userBio:{
+    userBio: {
         type: String,
         required: true,
     },
-    password:{
+    password: {
         type: String,
         required: true,
     },
 
-},{ timestamps: true })
+}, { timestamps: true })
 
 const User = model("User", userSchema);
 export default User;

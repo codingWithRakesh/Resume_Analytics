@@ -64,51 +64,54 @@ const parsePDF = asyncHandler(async (req, res, next) => {
     });
 
     const systemPrompt = `You are a resume parsing assistant. You will be given raw text extracted from a resume PDF.
-    Extract the information and return ONLY a valid JSON object (no markdown, no code fences, no explanations) matching EXACTLY this structure:
+        Extract the information and return ONLY a valid JSON object (no markdown, no code fences, no explanations) matching EXACTLY this structure:
 
-    {
-    "candidate": {
-        "name": string or null,
-        "email": string or null,
-        "phone": string or null
-    },
-    "skills": [string],
-    "experience": [
         {
-        "company": string or null,
-        "role": string or null,
-        "duration": string or null,
-        "description": string or null,
-        "technologies": [string]
+        "candidate": {
+            "name": string or null,
+            "email": string or null,
+            "phone": string or null
+        },
+        "skills": [string],
+        "experience": [
+            {
+            "company": string or null,
+            "role": string or null,
+            "duration": string or null,
+            "description": string or null,
+            "technologies": [string]
+            }
+        ],
+        "education": [
+            {
+            "institution": string or null,
+            "degree": string or null,
+            "field": string or null,
+            "duration": string or null,
+            "description": string or null
+            }
+        ],
+        "projects": [
+            {
+            "name": string or null,
+            "description": string or null,
+            "technologies": [string],
+            "responsibilities": string or null
+            }
+        ],
+        "achievements": [string],
+        "certificates": [string],
+        "atsScore": number
         }
-    ],
-    "education": [
-        {
-        "institution": string or null,
-        "degree": string or null,
-        "field": string or null,
-        "duration": string or null,
-        "description": string or null
-        }
-    ],
-    "projects": [
-        {
-        "name": string or null,
-        "description": string or null,
-        "technologies": [string],
-        "responsibilities": string or null
-        }
-    ],
-    "achievements": [string],
-    "certificates": [string]
-    }
 
-    Rules:
-    - Use null for any field you cannot find, never use empty strings.
-    - If a list has no items, return an empty array.
-    - Do not invent information not present in the resume text.
-    - "duration" should be formatted as a readable date range if possible (e.g. "Jan 2022 - Present").
-    - Return ONLY the JSON object, nothing else.`;
+        Rules:
+        - Use null for any field you cannot find, never use empty strings.
+        - If a list has no items, return an empty array.
+        - Do not invent information not present in the resume text.
+        - "duration" should be formatted as a readable date range if possible (e.g. "Jan 2022 - Present").
+        - "atsScore" is an integer from 0 to 100 estimating how well this resume would perform against an Applicant Tracking System. Base it on: presence of clear contact info, standard section headings, quantified achievements, relevant skills/keywords, absence of complex formatting artifacts, and overall completeness. If the text is too sparse to judge well, return a conservative low score.
+        - Return ONLY the JSON object, nothing else.
+    `;
 
     const userPrompt = `Resume text:\n\n${extractedText}`;
 
@@ -135,6 +138,12 @@ const parsePDF = asyncHandler(async (req, res, next) => {
         throw new ApiError(500, "Failed to parse AI response into structured data");
     }
 
+    let atsScore = Number(parsedData?.atsScore);
+    if (!Number.isFinite(atsScore) || atsScore < 0 || atsScore > 100) {
+        atsScore = 0;
+    }
+    delete parsedData.atsScore;
+
     const newResume = await Resume.findOneAndUpdate(
         { userId: user._id },
         {
@@ -144,6 +153,7 @@ const parsePDF = asyncHandler(async (req, res, next) => {
             fileName,
             extractedText,
             parsedData,
+            atsScore
         },
         { new: true, upsert: true, setDefaultsOnInsert: true }
     );
