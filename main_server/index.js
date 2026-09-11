@@ -2,9 +2,8 @@ import app from "./src/app.js";
 import "./src/configs/env.js";
 
 import connectDB from "./src/db/db.js";
-import http from 'http';
+import {server} from "./src/socket/socket.js";
 const PORT = process.env.PORT || 8000;
-const server = http.createServer(app);
 
 connectDB().then(() => {
     server.on("error", (err)=>{

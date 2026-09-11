@@ -7,6 +7,7 @@ import Resume from '../models/resume.model.js';
 import { ChatGoogle } from '@langchain/google';
 import mongoose from 'mongoose';
 import User from '../models/user.model.js';
+import History from '../models/history.model.js';
 
 const parsePDF = asyncHandler(async (req, res, next) => {
     const userId = req.user._id;
@@ -161,6 +162,12 @@ const parsePDF = asyncHandler(async (req, res, next) => {
     if (!newResume) {
         throw new ApiError(500, "Failed to save resume");
     }
+
+    await History.create({
+        userId: user._id,
+        resumeId: newResume._id,
+        typeOfHistory: 'resume',
+    });
 
     return res
         .status(200)

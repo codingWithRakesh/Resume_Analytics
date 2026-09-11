@@ -3,6 +3,7 @@ import { ApiResponse } from '../utils/apiResponse.js';
 import { ApiError } from '../utils/apiError.js';
 import Resume from '../models/resume.model.js';
 import User from '../models/user.model.js';
+import History from '../models/history.model.js';
 import JobDescriptionAnalysis from '../models/jobDescriptionAnalysis.model.js';
 import mongoose from 'mongoose';
 import { buildJobDescriptionAnalysisPrompt } from '../utils/interviewPrompts.js';
@@ -58,6 +59,12 @@ const jobDescriptionAnalysis = asyncHandler(async (req, res) => {
     }
 
     const analysis = await JobDescriptionAnalysis.create(analysisPayload);
+
+    await History.create({
+        userId: user._id,
+        jobDescriptionAnalysisId: analysis._id,
+        typeOfHistory: 'jobDescriptionAnalysis',
+    });
 
     return res
         .status(201)
