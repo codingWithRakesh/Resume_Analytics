@@ -1,7 +1,5 @@
 import jwt from "jsonwebtoken"
 import User from "../models/user.model.js";
-import { ApiError } from "../utils/apiError.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
 import { initializeApp, cert } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 
@@ -20,40 +18,29 @@ initializeApp({
         universe_domain: process.env.FIREBASE_DOMAIN,
     })
 });
-const verifyUser = asyncHandler(async (req, res, next) => {
-    const token = req.headers.authorization?.split(" ")[1]
-    const token2 = req.cookies?.authToken || req.header("Authorization")?.replace("Bearer ", "");
-    console.log(token);
-    console.log(token2);
-    if (token) {
+const verifyUser = async (token, authType) => {
+
+    if (authType == "firebase") {
         const decoded = await getAuth().verifyIdToken(token);
         const email = decoded.email;
         const user = await User.findOne({ email }).select('-password').lean();
         if (!user) {
-            throw new ApiError(404, 'User not found');
+            return false;
 
         }
-        req.user = user;
-        // console.log(decoded);
+        return true
 
-        next();
     }
-    if (token2) {
-        const decoded = jwt.verify(token2, process.env.JWT_SERECT)
+    if (authType == "normal") {
+        const decoded = jwt.verify(token, process.env.JWT_SERECT)
         console.log(decoded);
         const email = decoded.email;
         const user = await User.findOne({ email }).select('-password').lean();
         if (!user) {
-            throw new ApiError(404, 'User not found');
-
+            return false
         }
-        req.user = user;
-        next();
+        return true
+
     }
-
-    if (!token && !token2) throw new ApiError(401, "Unauthorized ")
-
-
-});
-
-export  {verifyUser};
+}
+export default verifyUser;
