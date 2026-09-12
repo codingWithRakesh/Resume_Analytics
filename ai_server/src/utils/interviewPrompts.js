@@ -31,17 +31,17 @@ export const buildQuestionGenerationPrompt = (resume, user) => {
         ]
         }
     `;
- 
+
     const userPrompt = `Candidate name: ${user?.fullName || 'Unknown'}
         Candidate bio: ${user?.userBio || 'N/A'}
         
         Parsed resume data (JSON):
         ${JSON.stringify(resume?.parsedData || {}, null, 2)}
     `;
- 
+
     return { systemPrompt, userPrompt };
 };
- 
+
 export const buildTransitionPrompt = ({ previousQuestion, nextQuestion, resume, isFirst }) => {
     const systemPrompt = `You are a warm, encouraging AI interviewer speaking directly to a candidate during a live interview. Your job is to produce a short spoken transition and present the next question.
  
@@ -60,17 +60,17 @@ export const buildTransitionPrompt = ({ previousQuestion, nextQuestion, resume, 
         "question": "string"
         }
     `;
- 
+
     const context = {
         isFirstQuestion: !!isFirst,
         previousQuestion: previousQuestion
             ? {
-                  section: previousQuestion.section,
-                  topic: previousQuestion.topic,
-                  status: previousQuestion.status,
-                  answer: previousQuestion.answer,
-                  evaluation: previousQuestion.evaluation,
-              }
+                section: previousQuestion.section,
+                topic: previousQuestion.topic,
+                status: previousQuestion.status,
+                answer: previousQuestion.answer,
+                evaluation: previousQuestion.evaluation,
+            }
             : null,
         nextQuestion: {
             section: nextQuestion.section,
@@ -79,14 +79,14 @@ export const buildTransitionPrompt = ({ previousQuestion, nextQuestion, resume, 
         },
         resumeContext: resume?.parsedData || {},
     };
- 
+
     const userPrompt = `Interview transition context (JSON):
         ${JSON.stringify(context, null, 2)}
     `;
- 
+
     return { systemPrompt, userPrompt };
 };
- 
+
 export const buildIntentClassificationPrompt = (questionText, candidateMessage) => {
     const systemPrompt = `You are classifying a candidate's message during an interview to determine their intent with respect to the current question they were asked.
  
@@ -98,16 +98,17 @@ export const buildIntentClassificationPrompt = (questionText, candidateMessage) 
         Output ONLY valid JSON matching the schema below. No markdown fences, no commentary.
         
         JSON schema:
-        { "intent": "answer | explain | skip" }`;
-        
-            const userPrompt = `Question asked: ${questionText}
+        { "intent": "answer | explain | skip" }
+    `;
+
+    const userPrompt = `Question asked: ${questionText}
         
         Candidate message: ${candidateMessage}
     `;
- 
+
     return { systemPrompt, userPrompt };
 };
- 
+
 export const buildExplainPrompt = (question) => {
     const systemPrompt = `You are a helpful, patient AI interviewer. The candidate did not understand the question they were asked and needs it explained more simply.
  
@@ -116,13 +117,14 @@ export const buildExplainPrompt = (question) => {
         Output ONLY valid JSON matching the schema below. No markdown fences, no commentary.
         
         JSON schema:
-        { "explanation": "string" }`;
-        
-            const userPrompt = `Original question: ${question.question}
+        { "explanation": "string" }
+    `;
+
+    const userPrompt = `Original question: ${question.question}
         Simplified version already given: ${question.simplifiedQuestion}
         Expected topics a good answer should cover: ${(question.expectedTopics || []).join(', ')}
     `;
- 
+
     return { systemPrompt, userPrompt };
 };
 
@@ -141,15 +143,15 @@ export const buildReAskPrompt = (question) => {
         "question": "string"
         }
     `;
- 
+
     const userPrompt = `Question: ${question.question}
         Simplified version: ${question.simplifiedQuestion}
         Expected topics a good answer should cover: ${(question.expectedTopics || []).join(', ')}
     `;
- 
+
     return { systemPrompt, userPrompt };
 };
- 
+
 export const buildAnswerEvaluationPrompt = ({ question, answer, resume }) => {
     const systemPrompt = `You are an expert technical interview evaluator. Evaluate the candidate's answer to the given interview question fairly, constructively, and precisely.
  
@@ -179,7 +181,7 @@ export const buildAnswerEvaluationPrompt = ({ question, answer, resume }) => {
         "feedback": "string"
         }
     `;
- 
+
     const userPrompt = `Question: ${question.question}
         Difficulty: ${question.difficulty}
         Section: ${question.section}
@@ -190,10 +192,10 @@ export const buildAnswerEvaluationPrompt = ({ question, answer, resume }) => {
         Relevant resume context (JSON):
         ${JSON.stringify(resume?.parsedData || {}, null, 2)}
     `;
- 
+
     return { systemPrompt, userPrompt };
 };
- 
+
 export const buildFinalEvaluationPrompt = ({ questions, resume }) => {
     const systemPrompt = `You are a senior technical interview panel AI producing the final, holistic evaluation of a completed candidate interview. You will receive every question asked, the candidate's answer (if any), its individual evaluation (if answered), and the candidate's resume data.
  
@@ -225,7 +227,7 @@ export const buildFinalEvaluationPrompt = ({ questions, resume }) => {
         "summary": "string"
         }
     `;
- 
+
     const questionSummaries = questions.map((q) => ({
         number: q.number,
         section: q.section,
@@ -236,13 +238,49 @@ export const buildFinalEvaluationPrompt = ({ questions, resume }) => {
         answer: q.answer,
         evaluation: q.evaluation,
     }));
- 
+
     const userPrompt = `All interview questions with answers and evaluations (JSON):
         ${JSON.stringify(questionSummaries, null, 2)}
         
         Candidate resume data (JSON):
         ${JSON.stringify(resume?.parsedData || {}, null, 2)}
     `;
+
+    return { systemPrompt, userPrompt };
+};
+
+export const buildJobDescriptionAnalysisPrompt = ({ resume, jobDescription }) => {
+    const systemPrompt = `You are an expert technical recruiter and ATS (Applicant Tracking System) analyst. You will receive a candidate's parsed resume data and a raw job description (this may be text pasted directly from a company's careers page, so it can be messy and may or may not include a title or company name).
  
+        Provide:
+        - "title": the job title, ONLY if it is actually present/identifiable in the job description text (e.g. a heading like "Senior Backend Engineer"). If the text does not clearly contain a job title, use null. Do not guess or invent one.
+        - "company": the hiring company's name, ONLY if it is actually present/identifiable in the job description text. If the text does not mention a company name, use null. Do not guess or invent one.
+        - "matchScore": an overall match score from 0 to 100 representing how well the resume fits the job description, considering skills, experience, projects, and education together.
+        - "matchedKeywords": array of specific skills/technologies/requirements mentioned in the job description that ARE clearly present in the resume.
+        - "missingKeywords": array of specific skills/technologies/requirements mentioned in the job description that are NOT present in the resume.
+        - "suggestions": array of specific, actionable suggestions for how the candidate could improve their resume or profile to better match this job description (e.g. skills to learn, projects to add, how to phrase existing experience).
+        
+        Be honest and precise — do not inflate the match score, and do not invent keywords, titles, or company names that are not actually present in the given text.
+        
+        Output ONLY valid JSON matching the schema below. No markdown fences, no commentary.
+        
+        JSON schema:
+        {
+        "title": "string | null",
+        "company": "string | null",
+        "matchScore": number,
+        "matchedKeywords": ["string"],
+        "missingKeywords": ["string"],
+        "suggestions": ["string"]
+        }
+    `;
+
+    const userPrompt = `Job description (raw text, exactly as pasted by the user):
+        ${jobDescription}
+        
+        Candidate resume data (JSON):
+        ${JSON.stringify(resume?.parsedData || {}, null, 2)}
+    `;
+
     return { systemPrompt, userPrompt };
 };

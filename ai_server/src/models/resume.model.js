@@ -1,18 +1,18 @@
-import {Schema, model} from 'mongoose';
+import { Schema, model } from 'mongoose';
 
 const resumeSchema = new Schema(
   {
     userId: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: true,
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
     },
     fileName: {
       type: String,
       required: true,
     },
     fileId: {
-        type: String,
+      type: String,
     },
     url: {
       type: String,

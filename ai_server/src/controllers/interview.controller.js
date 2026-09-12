@@ -6,6 +6,7 @@ import { ChatGoogle } from '@langchain/google';
 import Interview from '../models/interview.model.js';
 import User from '../models/user.model.js';
 import Question from '../models/question.model.js';
+import History from '../models/history.model.js';
 import mongoose from 'mongoose';
 import { callAIJson } from '../utils/aiClient.js';
 import {
@@ -92,6 +93,12 @@ const generateInterviewQuestions = asyncHandler(async (req, res, next) => {
                 { session }
             );
             interview = created[0];
+
+            await History.create({
+                userId: user._id,
+                interviewId: interview._id,
+                typeOfHistory: 'interview',
+            }, { session });
 
             const questionDocs = questionsPayload.map((q, idx) => ({
                 interviewId: interview._id,
