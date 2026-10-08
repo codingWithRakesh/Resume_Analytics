@@ -2,7 +2,7 @@ import { CheckCircle2 } from 'lucide-react'
 
 export default function WorkingWell({ items = [] }) {
   return (
-    <section className="flex min-h-0 flex-col overflow-hidden border-[2px] border-black bg-[#edfff7] shadow-[7px_7px_0_#111]">
+    <section className="flex min-h-0 flex-col overflow-hidden border-[2px] border-black bg-[#edfff7] shadow-[7px_7px_0_#111] max-lg:min-h-[15.8rem]">
       <div className="flex shrink-0 items-center justify-between border-b-[2px] border-black bg-[#a8f0ce] px-4 py-2">
         <div className="flex items-center gap-4">
           <div className="grid h-10 w-10 place-items-center rounded-full bg-[#20c679] text-white"><CheckCircle2 size={25} strokeWidth={3} /></div>
