@@ -45,7 +45,7 @@ const Navbar = () => {
       <div className={`heading flex mt-6 h-full min-w-0 flex-1 items-start ${pathname === '/' && 'pl-2'} max-[720px]:pl-3`}>
         <div className={`flex min-w-0 flex-col items-start gap-1 ${isJDAnalysis ? 'w-full' : ''}`}>
             {pageHeading ? (
-              <p className={`${isJDAnalysis ? 'mb-2 w-fit max-w-full border-[3px] border-[#111] bg-[#b290ff] px-3 py-1 text-[clamp(1.4rem,2.2vw,1.8rem)] tracking-tight shadow-[5px_5px_0_#111]' : 'mb-2 w-fit max-w-full border-[3px] border-[#111] bg-[#b290ff] px-3 py-1 ' + selectedNameSize + ' tracking-tight shadow-[5px_5px_0_#111]'} font-black uppercase leading-none text-[#111]`}>
+              <p className={`mb-2 w-fit max-w-full border-[3px] border-[#111] bg-[#b290ff] px-3 py-1 ${selectedNameSize} tracking-tight shadow-[5px_5px_0_#111] font-black uppercase leading-none text-[#111]`}>
                 {pageHeading.title}
               </p>
             ) : (

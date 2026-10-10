@@ -38,15 +38,15 @@ const JDAnalysis = () => {
   const analysis = routeData?.jobDescriptionAnalysis || routeData || providedAnalysis
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-[1700px] flex-col gap-4 px-5 pb-3 pt-28 text-[#111] sm:px-6 lg:px-7">
-      <div className="h-32 shrink-0">
+    <div className="mx-auto flex min-h-screen w-full max-w-[1700px] flex-col gap-4 px-5 pb-3 pt-28 text-[#111] sm:px-6 lg:px-7 max-lg:pt-32 max-sm:px-4 max-sm:pb-6">
+      <div className="h-32 shrink-0 max-lg:h-auto">
         <ScoreCard analysis={analysis} />
       </div>
-      <div className="flex h-[15.8rem] shrink-0 gap-4">
+      <div className="flex h-[15.8rem] mt-[1.7rem] shrink-0 gap-4 max-lg:h-auto max-lg:flex-col">
         <AreasToImprove items={analysis.missingKeywords || []} />
         <WorkingWell items={analysis.matchedKeywords || []} />
       </div>
-      <div className="h-[15.8rem] shrink-0 [&>section]:h-full">
+      <div className="h-[15.8rem] shrink-0 [&>section]:h-full max-lg:h-auto max-lg:min-h-[15.8rem]">
         <Suggestions suggestions={analysis.suggestions || []} />
       </div>
     </div>

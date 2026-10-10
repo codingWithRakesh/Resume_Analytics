@@ -2,7 +2,7 @@ import { AlertCircle } from 'lucide-react'
 
 export default function AreasToImprove({ items = [] }) {
   return (
-    <section className="flex min-h-0 flex-col overflow-hidden border-[2px] border-black bg-[#fff3f4] shadow-[7px_7px_0_#111]">
+    <section className="flex min-h-0 flex-col overflow-hidden border-[2px] border-black bg-[#fff3f4] shadow-[7px_7px_0_#111] max-lg:min-h-[15.8rem]">
       <div className="flex shrink-0 items-center justify-between border-b-[2px] border-black bg-[#ffb6c0] px-4 py-2">
         <div className="flex items-center gap-4">
           <div className="grid h-10 w-10 rounded-full place-items-center bg-[#f23d56] text-white"><AlertCircle size={24} strokeWidth={3} /></div>
