@@ -13,8 +13,8 @@ import BrandLogo from './BrandLogo.jsx'
 const defaultNavigationItems = [
   { label: 'Dashboard', path: '/', icon: LayoutDashboard, end: true },
   { label: 'AI Interview', path: '/interview', icon: MessageSquare },
-  { label: 'Old Activities', path: '/activities', icon: Clock3 },
-  { label: 'Resume Analysis', path: '/resume-analysis', icon: FileText },
+  { label: 'Old Activities', path: '/history', icon: Clock3 },
+  { label: 'Job Description Analysis', path: '/jdAnalysis', icon: FileText },
   { label: 'Job Finder', path: '/job-finder', icon: BriefcaseBusiness },
   { label: 'My Profile', path: '/profile', icon: UserRound },
 ]
@@ -40,7 +40,7 @@ export default function Sidebar({
       />
 
       <nav aria-label="Main navigation" className="mt-7 max-[1100px]:mt-6 max-[720px]:mt-8">
-        <ul className="flex flex-col gap-1.5">
+        <ul className="flex flex-col gap-3">
           {navigationItems.map(({ label, path, icon: Icon, end }) => (
             <li key={path}>
               <NavLink
