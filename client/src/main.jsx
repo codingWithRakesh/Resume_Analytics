@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard.jsx'
 import ForgotPassword from './pages/Forgotpassword.jsx'
 import ResumeUpload from './pages/ResumeUpload.jsx'
 import History from './pages/History.jsx'
+import JDAnalysis from './pages/JDAnalysis.jsx'
 
 const router = createBrowserRouter([
   {
@@ -41,14 +42,18 @@ const router = createBrowserRouter([
         path: "/history",
         element: <History />,
       },
+      {
+        path: "/jdAnalysis",
+        element: <JDAnalysis />,
+      },
     ]
   }
 ])
 
-createRoot(document.getElementById("root")).render(
+createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AuthProvider>
       <RouterProvider router={router} />
     </AuthProvider>
-  </StrictMode>,
-);
+  </StrictMode>
+)
