@@ -9,6 +9,7 @@ const useUserStore = create(async (set) => ({
     error: null,
     loginProcess: null,
     sendOtpProcess:null,
+    refId:null,
     fecthuser: async () => {
         try {
             set({ isLoading: true, error: null });
@@ -64,12 +65,12 @@ const useUserStore = create(async (set) => ({
         }
 
     },
-    sendMail: async (email) => {
+    sendOtp: async (email) => {
         try {
             set({isLoading: true, error: null})
             const response= await api.post("/api/v1/auth/send-email",{email});
             if(response.status===200){
-                set({sendOtpProcess:true})
+                set({sendOtpProcess:true,refId:response.data.referenceCode})
             }else{
                 set({sendOtpProcess:false})
             }
@@ -79,6 +80,20 @@ const useUserStore = create(async (set) => ({
             throw error
         }
         finally {
+            set({ isLoding: false })
+        }
+    },
+    checkOTP: async(otp)=>{
+        try {
+            set({isLoading: true, error: null})
+            const response = await api.post("/api/v1/auth/check-otp",{referenceCode:refId,otp})
+            
+
+            
+        } catch (error) {
+            
+            
+        }finally {
             set({ isLoding: false })
         }
     }
